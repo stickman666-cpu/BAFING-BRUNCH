@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Suivi ticket - Brunch du Bafing</title>
+    <link rel="stylesheet" href="/styles.css">
+  </head>
+  <body class="status-body">
+    <main class="status-card">
+      <a href="/">Retour</a>
+      <p class="eyebrow">Suivi de commande</p>
+      <h1 id="title">Verification...</h1>
+      <div id="content"></div>
+    </main>
+    <script>
+      const params = new URLSearchParams(location.search);
+      const id = params.get("id");
+      const token = params.get("token");
+      const title = document.querySelector("#title");
+      const content = document.querySelector("#content");
+
+      async function load() {
+        const response = await fetch(`/api/orders/${id}?token=${token}`);
+        const data = await response.json();
+        if (!response.ok) {
+          title.textContent = "Commande introuvable";
+          content.innerHTML = "<p>Verifiez le lien de suivi recu apres la commande.</p>";
+          return;
+        }
+        title.textContent = data.ticketCode;
+        if (data.status === "paid") {
+          content.innerHTML = `<p>Ton paiement est confirme. Ton ticket PDF est pret.</p><a class="primary full" href="/tickets/${data.id}?token=${data.token}">Telecharger le ticket PDF</a>`;
+        } else if (data.status === "cancelled") {
+          content.innerHTML = "<p>Cette commande a ete annulee. Contacte l'infoline si besoin.</p>";
+        } else {
+          content.innerHTML = `<p>Commande en attente de confirmation. Apres ton paiement Wave, l'organisateur validera la reception.</p><a class="secondary full" href="${data.waveUrl}" target="_blank" rel="noopener">Payer maintenant</a>`;
+        }
+      }
+      load();
+    </script>
+  </body>
+</html>

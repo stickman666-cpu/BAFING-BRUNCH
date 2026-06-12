@@ -1,0 +1,16 @@
+{
+  "name": "brunch-bafing-ticketing",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Billetterie locale pour Le Brunch du Bafing",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "cookie": "^0.7.2",
+    "dotenv": "^17.4.2",
+    "nodemailer": "^8.0.11",
+    "pdfkit": "^0.16.0"
+  }
+}

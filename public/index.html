@@ -1,0 +1,149 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Le Brunch du Bafing - Billetterie</title>
+    <link rel="stylesheet" href="/styles.css">
+  </head>
+  <body>
+    <header class="hero">
+      <nav>
+        <a class="brand" href="/">Brunch du Bafing</a>
+        <div class="nav-actions">
+          <span id="accountBadge"></span>
+          <a href="#tickets">Acheter un ticket</a>
+        </div>
+      </nav>
+      <div class="hero-grid">
+        <section class="hero-copy">
+          <p class="eyebrow">28 juin · Dress code blanc · Places limitees</p>
+          <h1>Le Brunch du Bafing</h1>
+          <p>Un moment gourmand, un cadre convivial, de la bonne musique, des rencontres et une ambiance chaleureuse pour celebrer l'art de bien vivre et de bien manger.</p>
+          <div class="hero-actions">
+            <a class="primary" href="#tickets">Choisir mon pack</a>
+            <a class="secondary" href="tel:0787519554">Appeler l'infoline</a>
+          </div>
+        </section>
+        <img src="/affiche-brunch-bafing.jpeg" alt="Affiche du Brunch du Bafing">
+      </div>
+    </header>
+
+    <main>
+      <section class="event-strip" aria-label="Informations evenement">
+        <div><span>Date</span><strong>28 juin</strong></div>
+        <div><span>Lieu</span><strong>A preciser</strong></div>
+        <div><span>Dress code</span><strong>Blanc</strong></div>
+        <div><span>Infoline</span><strong>0787519554</strong></div>
+      </section>
+
+      <section class="intro">
+        <div>
+          <p class="eyebrow">Experience</p>
+          <h2>Detente, partage et gourmandise.</h2>
+        </div>
+        <p>Que vous veniez en famille, entre amis ou en couple, installez-vous confortablement et laissez-vous porter par une atmosphere chaleureuse ou le temps s'arrete pour laisser place au plaisir.</p>
+      </section>
+
+      <section id="tickets" class="ticket-layout">
+        <div class="pack-list">
+          <article class="pack selected" data-pack="classique">
+            <div class="pack-top">
+              <div>
+                <p>Pack Classique</p>
+                <h3>3 000 F</h3>
+              </div>
+              <button type="button">Choisir</button>
+            </div>
+            <ul>
+              <li>L'entree du jour</li>
+              <li>1 repas au choix parmi les 3 propositions</li>
+              <li>Le dessert</li>
+              <li>Un cocktail rafraichissant sans alcool</li>
+            </ul>
+          </article>
+
+          <article class="pack" data-pack="gourmand">
+            <div class="pack-top">
+              <div>
+                <p>Pack Gourmand</p>
+                <h3>5 000 F</h3>
+              </div>
+              <button type="button">Choisir</button>
+            </div>
+            <ul>
+              <li>L'entree du jour</li>
+              <li>2 repas differents au choix parmi les 3 de la carte</li>
+              <li>Le dessert</li>
+              <li>Un cocktail au choix, avec ou sans alcool</li>
+            </ul>
+          </article>
+        </div>
+
+        <aside class="checkout">
+          <p class="eyebrow">Commande</p>
+          <h2>Reserve ton ticket</h2>
+          <div class="summary">
+            <span id="summaryPack">Pack Classique</span>
+            <strong id="summaryPrice">3 000 F</strong>
+          </div>
+          <section id="authBox" class="auth-box">
+            <div class="auth-tabs">
+              <button type="button" class="active" data-auth-tab="register">Creer un compte</button>
+              <button type="button" data-auth-tab="login">Connexion</button>
+            </div>
+            <form id="registerForm" class="auth-form">
+              <label>Nom complet<input name="name" autocomplete="name" required></label>
+              <label>Telephone WhatsApp<input name="phone" autocomplete="tel" required></label>
+              <label>Email<input name="email" type="email" autocomplete="email" required></label>
+              <label>Mot de passe<input name="password" type="password" autocomplete="new-password" minlength="6" required></label>
+              <button class="primary full" type="submit">Creer mon compte</button>
+            </form>
+            <form id="loginForm" class="auth-form" hidden>
+              <label>Email<input name="email" type="email" autocomplete="email" required></label>
+              <label>Mot de passe<input name="password" type="password" autocomplete="current-password" required></label>
+              <button class="primary full" type="submit">Me connecter</button>
+            </form>
+            <p id="authMessage"></p>
+          </section>
+          <section id="connectedBox" class="connected-box" hidden>
+            <p>Compte connecte</p>
+            <strong id="connectedName"></strong>
+            <span id="connectedInfo"></span>
+            <button type="button" class="secondary full" id="logoutButton">Changer de compte</button>
+          </section>
+          <form id="orderForm" hidden>
+            <input type="hidden" name="pack" value="classique">
+            <label>Note facultative<input name="note" placeholder="Ex : sans alcool, nom accompagnant..."></label>
+            <button class="primary full" type="submit">Creer ma commande</button>
+          </form>
+          <div id="paymentBox" class="payment-box" hidden></div>
+        </aside>
+      </section>
+
+      <section class="faq">
+        <h2>Comment ca marche ?</h2>
+        <details open>
+          <summary>1. Je choisis mon pack</summary>
+          <p>Le site cree une commande avec un numero de ticket unique commencant par PC ou PG.</p>
+        </details>
+        <details>
+          <summary>2. Je paie avec Wave</summary>
+          <p>Le bouton Payer maintenant ouvre le lien Wave correspondant au montant exact de ton pack.</p>
+        </details>
+        <details>
+          <summary>3. L'organisateur confirme</summary>
+          <p>Apres verification du paiement recu, l'admin confirme la commande et le PDF devient disponible.</p>
+        </details>
+      </section>
+    </main>
+
+    <footer>
+      <strong>Le Brunch du Bafing</strong>
+      <span>0787519554 · 0170618260 · 0797441776</span>
+      <a href="/admin">Espace admin</a>
+    </footer>
+
+    <script src="/app.js"></script>
+  </body>
+</html>
