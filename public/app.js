@@ -75,7 +75,7 @@ function renderHistory(orders) {
     const ticketUrl = `/tickets/${order.id}?token=${order.token}`;
     const statusUrl = `/suivi.html?id=${order.id}&token=${order.token}`;
     const action = order.status === "paid"
-      ? `<a class="primary" href="${ticketUrl}">Telecharger le PDF</a>`
+      ? `<a class="primary" href="${ticketUrl}" download="ticket-${order.ticketCode}.pdf">Telecharger le PDF</a>`
       : order.status === "pending"
         ? `<a class="secondary" href="${order.waveUrl}" target="_blank" rel="noopener">Payer maintenant</a>`
         : `<span class="history-muted">Contactez l'infoline</span>`;

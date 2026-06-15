@@ -203,45 +203,110 @@ function publicOrder(order) {
   };
 }
 
+function drawCoverImage(doc, imagePath, x, y, width, height) {
+  if (!fs.existsSync(imagePath)) return false;
+  const image = doc.openImage(imagePath);
+  const imageRatio = image.width / image.height;
+  const boxRatio = width / height;
+  let drawWidth = width;
+  let drawHeight = height;
+  let drawX = x;
+  let drawY = y;
+
+  if (imageRatio > boxRatio) {
+    drawHeight = height;
+    drawWidth = height * imageRatio;
+    drawX = x - (drawWidth - width) / 2;
+  } else {
+    drawWidth = width;
+    drawHeight = width / imageRatio;
+    drawY = y - (drawHeight - height) / 2;
+  }
+
+  doc.save();
+  doc.rect(x, y, width, height).clip();
+  doc.image(imagePath, drawX, drawY, { width: drawWidth, height: drawHeight });
+  doc.restore();
+  return true;
+}
+
+function labelValue(doc, label, value, x, y, options = {}) {
+  doc.fillColor(options.labelColor || "#b9aa8e").fontSize(options.labelSize || 8).text(label.toUpperCase(), x, y, {
+    width: options.width || 180,
+    characterSpacing: 0.8
+  });
+  doc.fillColor(options.valueColor || "#ffffff").fontSize(options.valueSize || 13).text(value, x, y + 13, {
+    width: options.width || 180,
+    lineGap: 1
+  });
+}
+
 function drawTicketPdf(order, stream) {
   const pack = packs[order.pack];
-  const doc = new PDFDocument({ size: "A4", margin: 42 });
+  const doc = new PDFDocument({ size: [842, 595], margin: 0 });
+  const posterPath = path.join(PUBLIC_DIR, "affiche-brunch-bafing.jpeg");
   doc.pipe(stream);
 
-  doc.rect(0, 0, 595, 842).fill("#0b0907");
-  doc.fillColor("#d7a84d").fontSize(18).text("LE BRUNCH DU BAFING", 42, 42, { align: "center" });
-  doc.moveDown(0.5);
-  doc.fillColor("#ffffff").fontSize(38).text(pack.name.toUpperCase(), { align: "center" });
-  doc.fillColor("#d7a84d").fontSize(24).text(`${pack.price.toLocaleString("fr-FR")} F CFA`, { align: "center" });
+  doc.rect(0, 0, 842, 595).fill("#090705");
+  drawCoverImage(doc, posterPath, 0, 0, 842, 595);
+  doc.rect(0, 0, 842, 595).fillOpacity(0.70).fill("#090705").fillOpacity(1);
 
-  doc.roundedRect(72, 180, 451, 270, 10).fillAndStroke("#15110d", "#d7a84d");
-  doc.fillColor("#ffffff").fontSize(13).text("Numero de ticket", 98, 210);
-  doc.fillColor("#d7a84d").fontSize(28).text(order.ticketCode, 98, 232);
-  doc.fillColor("#ffffff").fontSize(13).text("Nom", 98, 286);
-  doc.fontSize(20).text(order.buyerName, 98, 306);
-  doc.fontSize(13).text("Telephone", 98, 354);
-  doc.fontSize(18).text(order.buyerPhone, 98, 374);
-  doc.fontSize(13).text("Statut", 98, 414);
-  doc.fillColor("#5ee28a").fontSize(18).text("Paiement confirme", 98, 434);
+  doc.roundedRect(38, 46, 766, 486, 18).fillOpacity(0.92).fillAndStroke("#11100d", "#d7a84d").fillOpacity(1);
+  doc.roundedRect(60, 70, 722, 438, 12).strokeColor("#5c4320").lineWidth(1).stroke();
 
-  doc.fillColor("#d7a84d").fontSize(16).text("Inclus dans votre formule", 72, 500);
-  doc.fillColor("#ffffff").fontSize(12);
-  pack.includes.forEach((item) => doc.text(`- ${item}`, 92, doc.y + 10));
+  doc.save();
+  doc.rect(60, 70, 245, 438).clip();
+  drawCoverImage(doc, posterPath, 60, 70, 245, 438);
+  doc.rect(60, 70, 245, 438).fillOpacity(0.20).fill("#000000").fillOpacity(1);
+  doc.restore();
 
-  doc.fillColor("#ffffff").fontSize(14).text("Date : 28 juin", 72, 660);
-  doc.text("Lieu : a preciser", 72, 684);
-  doc.text("Dress code : blanc", 72, 708);
-  doc.fillColor("#d7a84d").fontSize(11).text("Presentez ce ticket a l'entree. Ticket personnel et verifiable par son numero.", 72, 770, { align: "center" });
+  doc.moveTo(334, 70).lineTo(334, 508).dash(7, { space: 7 }).strokeColor("#d7a84d").lineWidth(1.2).stroke().undash();
+  for (let y = 88; y < 506; y += 38) {
+    doc.circle(334, y, 5).fill("#d7a84d");
+  }
+
+  doc.fillColor("#d7a84d").fontSize(12).text("TICKET OFFICIEL", 366, 86, { width: 190, characterSpacing: 1.5 });
+  doc.fillColor("#ffffff").fontSize(34).text("LE BRUNCH DU BAFING", 366, 108, { width: 380, lineGap: -2 });
+  doc.fillColor("#d7a84d").fontSize(17).text(pack.name.toUpperCase(), 366, 184, { width: 260 });
+  doc.fillColor("#ffffff").fontSize(28).text(`${pack.price.toLocaleString("fr-FR")} F CFA`, 630, 178, { width: 120, align: "right" });
+
+  doc.roundedRect(366, 232, 382, 108, 10).fillAndStroke("#19150f", "#5c4320");
+  labelValue(doc, "Nom du participant", order.buyerName, 388, 252, { width: 210, valueSize: 16 });
+  labelValue(doc, "Telephone", order.buyerPhone, 620, 252, { width: 110, valueSize: 13 });
+  labelValue(doc, "Numero de ticket", order.ticketCode, 388, 298, { width: 230, valueSize: 17, valueColor: "#d7a84d" });
+  labelValue(doc, "Statut", "Paiement confirme", 620, 298, { width: 110, valueSize: 12, valueColor: "#69e28e" });
+
+  labelValue(doc, "Date", "28 juin", 366, 366, { width: 90, valueSize: 15 });
+  labelValue(doc, "Lieu", "A preciser", 476, 366, { width: 120, valueSize: 15 });
+  labelValue(doc, "Dress code", "Blanc", 620, 366, { width: 90, valueSize: 15 });
+
+  doc.fillColor("#d7a84d").fontSize(12).text("FORMULE INCLUSE", 366, 426, { width: 180, characterSpacing: 1.1 });
+  doc.fillColor("#ffffff").fontSize(9.5);
+  pack.includes.slice(0, 4).forEach((item, index) => {
+    doc.text(`- ${item}`, 366, 448 + index * 15, { width: 380, lineGap: 1 });
+  });
+
+  doc.roundedRect(80, 398, 185, 70, 8).fillOpacity(0.88).fillAndStroke("#11100d", "#d7a84d").fillOpacity(1);
+  doc.fillColor("#d7a84d").fontSize(9).text("A PRESENTER A L'ENTREE", 96, 416, { width: 154, align: "center", characterSpacing: 1 });
+  doc.fillColor("#ffffff").fontSize(13).text(order.ticketCode, 96, 438, { width: 154, align: "center" });
+
+  doc.fillColor("#b9aa8e").fontSize(8).text("Ticket personnel, verifiable par son numero. Toute duplication peut entrainer un refus a l'entree.", 366, 494, {
+    width: 382,
+    align: "center"
+  });
   doc.end();
 }
 
-function buildTicketPdf(order, res) {
+async function buildTicketPdf(order, res) {
   const filename = `ticket-${order.ticketCode}.pdf`;
+  const pdf = await ticketPdfBuffer(order);
   res.writeHead(200, {
     "Content-Type": "application/pdf",
-    "Content-Disposition": `attachment; filename="${filename}"`
+    "Content-Disposition": `attachment; filename="${filename}"`,
+    "Content-Length": pdf.length,
+    "Cache-Control": "no-store"
   });
-  drawTicketPdf(order, res);
+  res.end(pdf);
 }
 
 function ticketPdfBuffer(order) {
@@ -412,7 +477,7 @@ async function handleApi(req, res) {
     const order = readOrders().find((item) => item.id === id && item.token === token);
     if (!order) return send(res, 404, "Ticket introuvable.");
     if (order.status !== "paid") return send(res, 403, "Paiement pas encore confirme.");
-    return buildTicketPdf(order, res);
+    return await buildTicketPdf(order, res);
   }
 
   if (req.method === "POST" && url.pathname === "/admin/login") {

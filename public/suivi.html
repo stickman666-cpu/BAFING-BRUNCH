@@ -30,7 +30,7 @@
         }
         title.textContent = data.ticketCode;
         if (data.status === "paid") {
-          content.innerHTML = `<p>Ton paiement est confirme. Ton ticket PDF est pret.</p><a class="primary full" href="/tickets/${data.id}?token=${data.token}">Telecharger le ticket PDF</a>`;
+          content.innerHTML = `<p>Ton paiement est confirme. Ton ticket PDF est pret.</p><a class="primary full" href="/tickets/${data.id}?token=${data.token}" download="ticket-${data.ticketCode}.pdf">Telecharger le ticket PDF</a>`;
         } else if (data.status === "cancelled") {
           content.innerHTML = "<p>Cette commande a ete annulee. Contacte l'infoline si besoin.</p>";
         } else {
