@@ -198,7 +198,8 @@ function publicOrder(order) {
     price: pack.price,
     waveUrl: pack.waveUrl,
     createdAt: order.createdAt,
-    confirmedAt: order.confirmedAt || null
+    confirmedAt: order.confirmedAt || null,
+    emailStatus: order.emailStatus || null
   };
 }
 
@@ -386,6 +387,15 @@ async function handleApi(req, res) {
     orders.unshift(order);
     writeOrders(orders);
     return json(res, 201, publicOrder(order));
+  }
+
+  if (req.method === "GET" && url.pathname === "/api/my-orders") {
+    const user = currentUser(req);
+    if (!user) return json(res, 401, { error: "Connectez-vous pour voir votre historique." });
+    const orders = readOrders()
+      .filter((order) => order.userId === user.id || order.buyerEmail?.toLowerCase() === user.email.toLowerCase())
+      .map(publicOrder);
+    return json(res, 200, { orders });
   }
 
   if (req.method === "GET" && url.pathname.startsWith("/api/orders/")) {

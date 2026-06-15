@@ -17,6 +17,9 @@ const authMessage = document.querySelector("#authMessage");
 const registerForm = document.querySelector("#registerForm");
 const loginForm = document.querySelector("#loginForm");
 const logoutButton = document.querySelector("#logoutButton");
+const historySection = document.querySelector("#historySection");
+const historyList = document.querySelector("#historyList");
+const refreshHistoryButton = document.querySelector("#refreshHistoryButton");
 let currentUser = null;
 
 function selectPack(key) {
@@ -42,14 +45,71 @@ function renderUser(user) {
   authBox.hidden = Boolean(user);
   connectedBox.hidden = !user;
   form.hidden = !user;
+  historySection.hidden = !user;
   if (user) {
     connectedName.textContent = user.name;
     connectedInfo.textContent = `${user.phone} - ${user.email}`;
     accountBadge.textContent = user.name;
+    loadHistory();
   } else {
     connectedName.textContent = "";
     connectedInfo.textContent = "";
     accountBadge.textContent = "";
+    historyList.innerHTML = "";
+  }
+}
+
+function statusLabel(status) {
+  if (status === "paid") return "Paiement confirme";
+  if (status === "cancelled") return "Commande annulee";
+  return "En attente de confirmation";
+}
+
+function renderHistory(orders) {
+  if (!orders.length) {
+    historyList.innerHTML = `<article class="history-empty">Aucun ticket commande pour le moment.</article>`;
+    return;
+  }
+
+  historyList.innerHTML = orders.map((order) => {
+    const ticketUrl = `/tickets/${order.id}?token=${order.token}`;
+    const statusUrl = `/suivi.html?id=${order.id}&token=${order.token}`;
+    const action = order.status === "paid"
+      ? `<a class="primary" href="${ticketUrl}">Telecharger le PDF</a>`
+      : order.status === "pending"
+        ? `<a class="secondary" href="${order.waveUrl}" target="_blank" rel="noopener">Payer maintenant</a>`
+        : `<span class="history-muted">Contactez l'infoline</span>`;
+    const emailLine = order.status === "paid"
+      ? `<span>${order.emailStatus === "sent" ? "Ticket envoye par email" : "PDF disponible dans votre historique"}</span>`
+      : `<span>Le PDF sera disponible apres confirmation admin</span>`;
+
+    return `
+      <article class="history-item">
+        <div>
+          <strong>${order.ticketCode}</strong>
+          <span>${order.packName} - ${order.price.toLocaleString("fr-FR")} F</span>
+          ${emailLine}
+        </div>
+        <mark class="${order.status}">${statusLabel(order.status)}</mark>
+        <div class="history-actions">
+          ${action}
+          <a class="link-button" href="${statusUrl}">Voir le suivi</a>
+        </div>
+      </article>
+    `;
+  }).join("");
+}
+
+async function loadHistory() {
+  if (!currentUser) return;
+  historyList.innerHTML = `<article class="history-empty">Chargement...</article>`;
+  try {
+    const response = await fetch("/api/my-orders");
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.error || "Impossible de charger l'historique.");
+    renderHistory(data.orders);
+  } catch (error) {
+    historyList.innerHTML = `<article class="history-empty error">${error.message}</article>`;
   }
 }
 
@@ -114,6 +174,8 @@ logoutButton.addEventListener("click", async () => {
   paymentBox.hidden = true;
 });
 
+refreshHistoryButton.addEventListener("click", loadHistory);
+
 form.addEventListener("submit", async (event) => {
   event.preventDefault();
   if (!currentUser) {
@@ -150,6 +212,7 @@ form.addEventListener("submit", async (event) => {
     <a class="primary full" href="${data.waveUrl}" target="_blank" rel="noopener">Payer maintenant</a>
     <a class="secondary full" href="${statusUrl}">Voir le statut de mon ticket</a>
   `;
+  loadHistory();
 });
 
 fetch("/api/me")
