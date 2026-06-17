@@ -277,7 +277,7 @@ function drawTicketPdf(order, stream) {
   labelValue(doc, "Statut", "Paiement confirme", 620, 298, { width: 110, valueSize: 12, valueColor: "#69e28e" });
 
   labelValue(doc, "Date", "28 juin", 366, 366, { width: 90, valueSize: 15 });
-  labelValue(doc, "Lieu", "A preciser", 476, 366, { width: 120, valueSize: 15 });
+  labelValue(doc, "Lieu", "TOUBA : salle des fete de la mairie", 476, 366, { width: 130, valueSize: 10 });
   labelValue(doc, "Dress code", "Blanc", 620, 366, { width: 90, valueSize: 15 });
 
   doc.fillColor("#d7a84d").fontSize(12).text("FORMULE INCLUSE", 366, 426, { width: 180, characterSpacing: 1.1 });
